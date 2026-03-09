@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Trader Analytics Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial;
+            background: #0f172a;
+            color: white;
+        }
+
+        /* LOGIN / SIGNUP */
+        .login-page {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-box {
+            background: #1e293b;
+            padding: 40px;
+            border-radius: 10px;
+            width: 320px;
+            text-align: left;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            margin-bottom: 15px;
+            border: none;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        .password-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .password-wrapper input {
+            padding-right: 40px;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #666;
+            font-size: 18px;
+        }
+
+        .toggle-password:hover {
+            color: #22c55e;
+        }
+
+        button {
+            background: #22c55e;
+            border: none;
+            padding: 10px;
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        button:hover {
+            background: #16a34a;
+        }
+
+        .link {
+            color: #22c55e;
+            cursor: pointer;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .checkbox-container input[type="checkbox"] {
+            width: auto;
+            margin-right: 8px;
+            margin-top: 0;
+            margin-bottom: 0;
+        }
+
+        .checkbox-container label {
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        /* DASHBOARD */
+        .dashboard {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 220px;
+            background: #020617;
+            padding: 20px;
+        }
+
+        .sidebar h2 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .sidebar button {
+            margin-bottom: 10px;
+        }
+
+        /* MAIN */
+        .main {
+            flex: 1;
+            padding: 20px;
+            overflow: auto;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit,minmax(160px,1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: #1e293b;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            color: #94a3b8;
+            margin-bottom: 10px;
+        }
+
+        .stat-card p {
+            font-size: 24px;
+            color: #22c55e;
+            font-weight: bold;
+        }
+
+        .card {
+            background: #1e293b;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 10px;
+            border-bottom: 1px solid #334155;
+            text-align: center;
+        }
+
+        img {
+            width: 80px;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+    <div id="authPage" class="login-page">
+        <div id="loginBox" class="login-box">
+            <h2>Trader Login</h2>
+            <input id="loginUsername" placeholder="Username" value="">
+            <div class="password-wrapper">
+                <input type="password" id="loginPassword" placeholder="Password">
+                <i class="toggle-password fas fa-eye" onclick="togglePassword()"></i>
+            </div>
+            <div class="checkbox-container">
+                <input type="checkbox" id="rememberMe">
+                <label for="rememberMe">Remember me</label>
+            </div>
+           <button onclick="login()">Login</button>
+
+<p style="text-align:right;">
+<span class="link" onclick="showForgot()">Forgot Password?</span>
+</p>
+
+<p id="loginError" style="color: #ef4444;"></p>
+
+            <p>Don't have an account? <span class="link" onclick="showSignup()">Sign up</span></p>
+        </div>
+
+        <div id="signupBox" class="login-box" style="display:none;">
+            <h2>Create Account</h2>
+            <input id="signupUsername" placeholder="Username">
+            <div class="password-wrapper">
+                <input type="password" id="signupPassword" placeholder="Password">
+                <i class="toggle-password fas fa-eye" onclick="toggleSignupPassword()"></i>
+            </div>
+            <div class="password-wrapper">
+                <input type="password" id="signupConfirm" placeholder="Confirm Password">
+                <i class="toggle-password fas fa-eye" onclick="toggleConfirmPassword()"></i>
+            </div>
+            <button onclick="signup()">Sign Up</button>
+            <p id="signupError" style="color: #ef4444;"></p>
+            <p>Already have an account? <span class="link" onclick="showLogin()">Login</span></p>
+            <div id="forgotBox" class="login-box" style="display:none;">
+    <h2>Reset Password</h2>
+
+    <input id="forgotUsername" placeholder="Enter your username">
+
+    <div class="password-wrapper">
+        <input type="password" id="newPassword" placeholder="New Password">
+        <i class="toggle-password fas fa-eye" onclick="toggleNewPassword()"></i>
+    </div>
+
+    <button onclick="resetPassword()">Reset Password</button>
+
+    <p id="forgotError" style="color:#ef4444;"></p>
+
+    <p>Remember your password? 
+    <span class="link" onclick="showLogin()">Login</span></p>
+</div>
+
+        </div>
+    </div>
+
+    <div id="dashboard" class="dashboard" style="display:none">
+        <div class="sidebar">
+            <h2>Trader</h2>
+            <button onclick="showPage('home')">Dashboard</button>
+            <button onclick="showPage('addTrade')">Add Trade</button>
+            <button onclick="showPage('history')">Trade History</button>
+            <button onclick="logout()">Logout</button>
+        </div>
+
+        <div class="main">
+            <!-- DASHBOARD -->
+            <div id="home">
+                <div class="stats">
+                    <div class="stat-card">
+                        <h3>Total Trades</h3>
+                        <p id="totalTrades">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Wins</h3>
+                        <p id="wins">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Losses</h3>
+                        <p id="losses">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Win Rate</h3>
+                        <p id="winrate">0%</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ADD TRADE -->
+            <div id="addTrade" style="display:none">
+                <div class="card">
+                    <h3>Add Trade</h3>
+                    <input type="date" id="date">
+                    <select id="pair">
+                        <option value="" disabled selected>Pairs</option>
+                        <optgroup label="currencyPairs">
+                            <option>EURUSD</option>
+                            <option>GBPUSD</option>
+                            <option>USDJPY</option>
+                            <option>USDCHF</option>
+                            <option>AUDUSD</option>
+                            <option>USDCAD</option>
+                            <option>NZDUSD</option>
+                            <option>EURGBP</option>
+                            <option>EURJPY</option>
+                            <option>GBPJPY</option>
+                            <option>EURCHF</option>
+                            <option>CHFJPY</option>
+                            <option>AUDCAD</option>
+                            <option>GBPCAD</option>
+                            <option>AUDNZD</option>
+                            <option>NZDJPY</option>
+                            <option>NZDCHF</option>
+                        </optgroup>
+                        <optgroup label="indicies">
+                            <option>US30</option>
+                            <option>NAS100</option>
+                            <option>SPX500</option>
+                            <option>GER40</option>
+                        </optgroup>
+                        <optgroup label="cryptoCurrencies">
+                            <option>XAU/USD</option>
+                            <option>BTCUSDT</option>
+                            <option>ETHUSDT</option>
+                            <option>SOLUSDT</option>
+                            <option>BNBUSDT</option>
+                        </optgroup>
+                        <optgroup label="stocks">
+                            <option>AAPL</option>
+                            <option>TSLA</option>
+                            <option>AMZN</option>
+                            <option>NVDA</option>
+                        </optgroup>
+                    </select>
+                    <select id="type">
+                        <option>Buy</option>
+                        <option>Sell</option>
+                    </select>
+                    <select id="session">
+                        <option>London</option>
+                        <option>New York</option>
+                    </select>
+                    <input id="lotsize" type="number" placeholder="Lot Size">
+                    <select id="outcome">
+                        <option value="" disabled selected>Outcome</option>
+                        <option>Win</option>
+                        <option>Loss</option>
+                        <option>Breakeven</option>
+                    </select>
+                    <label>Upload Screenshot</label>
+                    <input type="file" id="screenshot" accept="image/*">
+                    <textarea id="notes" placeholder="Trade Notes"></textarea>
+                    <button onclick="addTrade()">Save Trade</button>
+                </div>
+            </div>
+
+            <!-- HISTORY -->
+            <div id="history" style="display:none">
+                <div class="card">
+                    <h3>Trade History</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Pair</th>
+                                <th>Type</th>
+                                <th>Session</th>
+                                <th>Lot</th>
+                                <th>Outcome</th>
+                                <th>Screenshot</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tradeTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+        let trades = [];
+
+        // Password toggle functions
+        function togglePassword() {
+            let pass = document.getElementById("loginPassword");
+            let icon = document.querySelector("#loginBox .toggle-password");
+            
+            if (pass.type === "password") {
+                pass.type = "text";
+                icon.classList.remove("fa-eye");
+                icon.classList.add("fa-eye-slash");
+            } else {
+                pass.type = "password";
+                icon.classList.remove("fa-eye-slash");
+                icon.classList.add("fa-eye");
+            }
+        }
+
+        function toggleSignupPassword() {
+            let pass = document.getElementById("signupPassword");
+            let icon = document.querySelector("#signupBox .toggle-password");
+            
+            if (pass.type === "password") {
+                pass.type = "text";
+                icon.classList.remove("fa-eye");
+                icon.classList.add("fa-eye-slash");
+            } else {
+                pass.type = "password";
+                icon.classList.remove("fa-eye-slash");
+                icon.classList.add("fa-eye");
+            }
+        }
+
+        function toggleConfirmPassword() {
+            let pass = document.getElementById("signupConfirm");
+            let icon = document.querySelectorAll("#signupBox .toggle-password")[1];
+            
+            if (pass.type === "password") {
+                pass.type = "text";
+                icon.classList.remove("fa-eye");
+                icon.classList.add("fa-eye-slash");
+            } else {
+                pass.type = "password";
+                icon.classList.remove("fa-eye-slash");
+                icon.classList.add("fa-eye");
+            }
+        }
+
+        // Load remembered username on page load
+        window.addEventListener('load', function() {
+            const rememberedUser = localStorage.getItem('rememberedUser');
+            if (rememberedUser) {
+                document.getElementById('loginUsername').value = rememberedUser;
+                document.getElementById('rememberMe').checked = true;
+            }
+        });
+
+        function login() {
+            const username = document.getElementById("loginUsername").value;
+            const password = document.getElementById("loginPassword").value;
+            const rememberMe = document.getElementById("rememberMe").checked;
+
+            let users = JSON.parse(localStorage.getItem("users")) || {};
+
+            if (users[username] && users[username] === password) {
+                currentUser = username;
+
+                // Handle remember me
+                if (rememberMe) {
+                    localStorage.setItem('rememberedUser', username);
+                } else {
+                    localStorage.removeItem('rememberedUser');
+                }
+
+                document.getElementById("authPage").style.display = "none";
+                document.getElementById("dashboard").style.display = "flex";
+
+                loadTrades();
+            } else {
+                document.getElementById("loginError").innerText = "Invalid login";
+            }
+        }
+
+        function signup() {
+            let username = document.getElementById("signupUsername").value;
+            let password = document.getElementById("signupPassword").value;
+            let confirm = document.getElementById("signupConfirm").value;
+
+            let users = JSON.parse(localStorage.getItem("users")) || {};
+
+            if (password !== confirm) {
+                document.getElementById("signupError").innerText = "Passwords do not match";
+                return;
+            }
+
+            if (username && password) {
+                users[username] = password;
+                localStorage.setItem("users", JSON.stringify(users));
+                document.getElementById("signupError").style.color = "#22c55e";
+                document.getElementById("signupError").innerText = "Account created! Login now.";
+                
+                // Clear signup form
+                document.getElementById("signupUsername").value = "";
+                document.getElementById("signupPassword").value = "";
+                document.getElementById("signupConfirm").value = "";
+            } else {
+                document.getElementById("signupError").innerText = "Please fill all fields";
+            }
+        }
+
+        function showSignup() {
+            document.getElementById("loginBox").style.display = "none";
+            document.getElementById("signupBox").style.display = "block";
+            document.getElementById("loginError").innerText = "";
+        }
+
+        function showLogin() {
+            document.getElementById("signupBox").style.display = "none";
+            document.getElementById("loginBox").style.display = "block";
+            document.getElementById("signupError").innerText = "";
+        }
+
+        function logout() {
+            currentUser = null;
+            document.getElementById("authPage").style.display = "flex";
+            document.getElementById("dashboard").style.display = "none";
+            document.getElementById("loginPassword").value = "";
+            
+            // Clear login error
+            document.getElementById("loginError").innerText = "";
+        }
+
+        function showPage(page) {
+            document.getElementById("home").style.display = "none";
+            document.getElementById("addTrade").style.display = "none";
+            document.getElementById("history").style.display = "none";
+
+            document.getElementById(page).style.display = "block";
+        }
+
+        function loadTrades() {
+            let stored = localStorage.getItem("trades_" + currentUser);
+            trades = stored ? JSON.parse(stored) : [];
+            render();
+        }
+
+        function addTrade() {
+            let file = document.getElementById("screenshot").files[0];
+
+            let reader = new FileReader();
+
+            reader.onload = function() {
+                let trade = {
+                    date: document.getElementById("date").value,
+                    pair: document.getElementById("pair").value,
+                    type: document.getElementById("type").value,
+                    session: document.getElementById("session").value,
+                    lotsize: document.getElementById("lotsize").value,
+                    outcome: document.getElementById("outcome").value,
+                    screenshot: reader.result,
+                    notes: document.getElementById("notes").value
+                };
+
+                trades.push(trade);
+                localStorage.setItem("trades_" + currentUser, JSON.stringify(trades));
+                render();
+                
+                // Clear form
+                document.getElementById("date").value = "";
+                document.getElementById("pair").value = "";
+                document.getElementById("lotsize").value = "";
+                document.getElementById("outcome").value = "";
+                document.getElementById("screenshot").value = "";
+                document.getElementById("notes").value = "";
+            };
+
+            if (file) {
+                reader.readAsDataURL(file);
+            } else {
+                reader.onload();
+            }
+        }
+
+        function render() {
+            let table = document.getElementById("tradeTable");
+            table.innerHTML = "";
+
+            let wins = 0;
+            let losses = 0;
+
+            trades.forEach(t => {
+                if (t.outcome === "Win") wins++;
+                if (t.outcome === "Loss") losses++;
+
+                let row = `<tr>
+                    <td>${t.date || '-'}</td>
+                    <td>${t.pair || '-'}</td>
+                    <td>${t.type || '-'}</td>
+                    <td>${t.session || '-'}</td>
+                    <td>${t.lotsize || '-'}</td>
+                    <td>${t.outcome || '-'}</td>
+                    <td>${t.screenshot ? `<img src="${t.screenshot}">` : '-'}</td>
+                </tr>`;
+
+                table.innerHTML += row;
+            });
+
+            let totalTrades = trades.length;
+            let winrate = totalTrades ? ((wins / totalTrades) * 100).toFixed(1) : 0;
+
+            document.getElementById("totalTrades").innerText = totalTrades;
+            document.getElementById("wins").innerText = wins;
+            document.getElementById("losses").innerText = losses;
+            document.getElementById("winrate").innerText = winrate + "%";
+            function showForgot(){
+    document.getElementById("loginBox").style.display = "none";
+    document.getElementById("signupBox").style.display = "none";
+    document.getElementById("forgotBox").style.display = "block";
+}
+
+function toggleNewPassword(){
+    let pass = document.getElementById("newPassword");
+    let icon = document.querySelector("#forgotBox .toggle-password");
+
+    if(pass.type === "password"){
+        pass.type = "text";
+        icon.classList.remove("fa-eye");
+        icon.classList.add("fa-eye-slash");
+    } else {
+        pass.type = "password";
+        icon.classList.remove("fa-eye-slash");
+        icon.classList.add("fa-eye");
+    }
+}
+
+function resetPassword(){
+    let username = document.getElementById("forgotUsername").value;
+    let newPass = document.getElementById("newPassword").value;
+
+    let users = JSON.parse(localStorage.getItem("users")) || {};
+
+    if(users[username]){
+        users[username] = newPass;
+        localStorage.setItem("users", JSON.stringify(users));
+
+        document.getElementById("forgotError").style.color = "#22c55e";
+        document.getElementById("forgotError").innerText = "Password reset successfully!";
+    }else{
+        document.getElementById("forgotError").innerText = "Username not found";
+    }
+}
+
+        }
+    </script>
+</body>
+</html>
